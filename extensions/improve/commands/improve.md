@@ -16,9 +16,10 @@ turn.
 ## Default Behavior
 
 If the raw user arguments are empty, this is a valid request to run one
-immediate improvement. Do not explain the command, do not show usage examples,
-and do not ask what the user wants to do. Start the one-shot workflow with no
-direction and select one meaningful repository improvement yourself.
+immediate improvement. Do not explain the command and do not show usage
+examples. Before selecting the task, ask the user one `ask_user_question`
+question to choose the context sources that should guide this single run, then
+continue into the one-shot workflow with the resolved context profile.
 
 ## Core Rules
 
@@ -26,8 +27,10 @@ direction and select one meaningful repository improvement yourself.
   or examples.
 - Never tell the user to use `/loop`.
 - Use `cron_create`, `cron_list`, and `cron_delete` directly.
-- Use `ask_user_question` only while setting up a new recurring `/improve`
-  job. Never ask the user questions from a stored `/improve:once` prompt.
+- Use `ask_user_question` only for:
+  - direct user-invoked `/improve` with empty arguments
+  - setting up a new recurring `/improve` job
+- Never ask the user questions from a stored `/improve:once` prompt.
 - Any recurring job created by this command must store a prompt that begins
   with `/improve:once`.
 - Only treat cron jobs whose prompt starts with `/improve:once` as belonging to
@@ -45,13 +48,14 @@ direction and select one meaningful repository improvement yourself.
   one-shot improvement unless the user explicitly asks for one.
 - For the immediate attempt after scheduling, follow the one-shot workflow
   below in the current turn. Do not try to invoke `/improve:once` from inside
-  this same turn.
+  this same turn, and do not ask the user a second setup question.
 
 ## Mode Parsing
 
 Parse the arguments in this order:
 
-1. Empty args: run one-shot with no direction.
+1. Empty args: run direct interactive one-shot setup, then run one-shot with
+   the resolved context profile.
 2. Exactly `list`: list only `/improve:once` jobs.
 3. Exactly `clear`: delete only `/improve:once` jobs.
 4. Starts with `--direction`: treat the rest as the one-shot direction.
@@ -61,6 +65,32 @@ Parse the arguments in this order:
 7. Starts with `每隔 <interval>` or `每 <interval>`: recurring.
 8. Ends with `每隔 <interval>`: recurring.
 9. Otherwise: one-shot with the full remaining text as the direction.
+
+## Direct One-Shot Setup
+
+If the invocation is a direct user-invoked `/improve` with empty arguments and
+it is not an immediate attempt after scheduling:
+
+1. Ask the user which context sources should guide this single improvement run.
+   Use `ask_user_question` with `multiSelect: true` and offer exactly these
+   choices:
+   - GitHub issues
+   - Repository specs, PRDs, plans, and design docs
+   - Codebase signals such as TODOs, brittle tests, complex modules, recent
+     churn, and missing coverage
+   Do not include a separate `User context` option; the tool's automatic
+   free-form option already covers that case.
+2. If the user provides free-form context through the tool's automatic Other
+   option, preserve it as resolved `user-context` for this run.
+3. If `ask_user_question` is unavailable in the current execution mode, proceed
+   with `codebase-signals` as the resolved context source and say that the
+   single run continued without interactive context setup.
+4. Continue into the one-shot workflow using the resolved context profile. Do
+   not schedule anything and do not build a stored `/improve:once` prompt.
+
+This setup applies only to a direct empty `/improve` invocation. It must not run
+for explicit directions, `list`, `clear`, recurring setup, the immediate
+one-shot attempt after scheduling, or scheduled `/improve:once` executions.
 
 ## Stored Context Flags
 
@@ -110,6 +140,9 @@ If the invocation is recurring:
 
 1. Resolve the direction from the invocation, if any.
 2. Run recurring context setup before creating the cron job:
+   This setup is the only interactive step for a recurring job; future
+   scheduled `/improve:once` executions must consume the stored prompt and run
+   unattended.
    - If there is no direction, ask the user which context sources should guide
      this improvement loop. Use `ask_user_question` with `multiSelect: true` and
      offer exactly these choices:

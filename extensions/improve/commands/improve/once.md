@@ -40,8 +40,9 @@ improvement attempt.
 - Keep the change coherent, worthwhile, and locally verifiable.
 - Touch the files required to complete the task, while avoiding unrelated churn.
 - Do not commit.
-- Never ask the user questions from `/improve:once`. Recurring setup already
-  encoded the user's choices in this prompt.
+- Never use `ask_user_question` or ask the user questions from
+  `/improve:once`. Recurring setup already encoded the user's choices in this
+  prompt, and scheduled executions must run unattended.
 
 ## Workflow
 

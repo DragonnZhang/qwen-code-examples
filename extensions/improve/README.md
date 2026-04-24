@@ -8,6 +8,10 @@ The extension adds `/improve`, a command that selects one meaningful,
 locally-verifiable codebase improvement, implements it in an isolated git
 worktree, and validates the result with a read-only test agent.
 
+When `/improve` is invoked without arguments, it asks which context sources
+should guide that single run before selecting a task. Recurring jobs ask once
+before scheduling, then reuse the stored context for unattended runs.
+
 It supports:
 
 - one-shot improvements with `/improve`
