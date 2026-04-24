@@ -31,6 +31,10 @@ It supports:
 /improve clear
 ```
 
+Use `/improve list` to show only scheduled improve jobs created by this
+extension. Use `/improve clear` to delete those scheduled improve jobs without
+touching unrelated cron jobs.
+
 Recurring jobs require Qwen Code's experimental cron tools:
 
 ```json
