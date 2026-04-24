@@ -21,10 +21,8 @@ It supports:
 
 ```text
 /improve
-/improve --once
-/improve improve auth flow
-/improve --every 2h
-/improve --every 2h uiux
+/improve <direction>
+/improve --every <interval> [direction]
 /improve list
 /improve clear
 ```
@@ -44,6 +42,6 @@ You can also enable them for a session with `QWEN_CODE_ENABLE_CRON=1`.
 ## Contents
 
 - `commands/improve.md`: public controller command
-- `commands/improve/once.md`: internal one-shot command used by scheduled jobs
+- `commands/improve/once.md`: internal hidden one-shot command used by scheduled jobs
 - `agents/improve-dev.md`: implementation worker
 - `agents/improve-test.md`: read-only validation worker

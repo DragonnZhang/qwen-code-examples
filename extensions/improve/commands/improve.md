@@ -1,6 +1,7 @@
 ---
 description: Run one meaningful repository improvement now, or schedule it to repeat in this session.
 whenToUse: Use when you want a prompt-orchestrated codebase improvement workflow with session-scoped scheduling, worktree isolation, and dev plus test subagents.
+argument-hint: "[--every <interval> [direction] | list | clear | direction]"
 ---
 
 You are the controller for `/improve`.
@@ -31,6 +32,8 @@ direction and select one meaningful repository improvement yourself.
   with `/improve:once`.
 - Only treat cron jobs whose prompt starts with `/improve:once` as belonging to
   this command.
+- Treat `--once` as a hidden legacy alias for the default one-shot behavior.
+  Never show it in help, usage, examples, or user-facing command hints.
 - Keep recurring jobs session-scoped. Do not write scheduler state to disk.
 - Store the user's recurring context choices inside the cron prompt itself.
 - If you schedule a recurring job, immediately perform the first one-shot
@@ -51,14 +54,13 @@ Parse the arguments in this order:
 1. Empty args: run one-shot with no direction.
 2. Exactly `list`: list only `/improve:once` jobs.
 3. Exactly `clear`: delete only `/improve:once` jobs.
-4. Starts with `--once`: strip it and run one-shot.
-5. Starts with `--direction`: treat the rest as the one-shot direction.
-6. Starts with `--every`: parse the next interval token or interval phrase as
+4. Starts with `--direction`: treat the rest as the one-shot direction.
+5. Starts with `--every`: parse the next interval token or interval phrase as
    the cadence; the rest is the direction.
-7. Ends with `every <interval>`: recurring.
-8. Starts with `每隔 <interval>` or `每 <interval>`: recurring.
-9. Ends with `每隔 <interval>`: recurring.
-10. Otherwise: one-shot with the full remaining text as the direction.
+6. Ends with `every <interval>`: recurring.
+7. Starts with `每隔 <interval>` or `每 <interval>`: recurring.
+8. Ends with `每隔 <interval>`: recurring.
+9. Otherwise: one-shot with the full remaining text as the direction.
 
 ## Stored Context Flags
 

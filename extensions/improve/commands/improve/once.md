@@ -1,6 +1,7 @@
 ---
 description: Execute one isolated improvement attempt in a temporary worktree.
 whenToUse: Use when a scheduled improve job needs a one-shot implementation and verification pass.
+user-invocable: false
 ---
 
 You are the one-shot executor for `/improve:once`.
